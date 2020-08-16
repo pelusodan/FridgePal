@@ -61,6 +61,10 @@ class _FridgeState extends State<Fridge> {
     return ListView.builder(
         itemCount: _fridgeItems.length,
         itemBuilder: (context, i) {
+          _fridgeItems.sort(
+                  (a,b)  {
+                return a.expiration.compareTo(b.expiration);
+              });
           return _buildFridgeItem(_fridgeItems[i]);
         });
   }
@@ -109,6 +113,9 @@ class _FridgeState extends State<Fridge> {
                         setState(() {
                           _fridgeItems
                               .add(FridgeItem(_selectedTitle, selectedDate));
+                          Navigator.of(
+                            context,
+                            rootNavigator: true).pop(context);
                         });
                       }
                     },
