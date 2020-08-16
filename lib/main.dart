@@ -40,7 +40,8 @@ final List<FridgeItem> exItems = [
 
 class _FridgeState extends State<Fridge> {
   final _fridgeItems = exItems;
-  final biggerFont = TextStyle(fontSize: 18.0);
+  final _biggerFont = TextStyle(fontSize: 18.0);
+  final _biggestFont = TextStyle(fontSize: 40.0);
   DateTime selectedDate = DateTime.now();
   final _formKey = GlobalKey<FormState>();
 
@@ -70,12 +71,16 @@ class _FridgeState extends State<Fridge> {
   }
 
   Widget _buildFridgeItem(FridgeItem fridgeItem) {
-    return ListTile(
-      title: Text(
-        fridgeItem.name,
-        style: biggerFont,
+    return Card(
+      child: ListTile(
+        leading: Text(
+          "${fridgeItem.expiration.difference(DateTime.now()).inDays} days",
+          style: _biggestFont,
+        ),
+        title: Text(
+            fridgeItem.name,
+        style: _biggerFont,),
       ),
-      subtitle: Text(fridgeItem.expiration.toString()),
     );
   }
 
