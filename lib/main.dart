@@ -2,13 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:collection';
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
+import 'fridge.dart';
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => Fridge(),
+      child: MyApp(),
+    )
+  );
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -16,21 +27,32 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'FridgePal',
       theme: ThemeData(primaryColor: Colors.amber),
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Text("What's in the Fridge?"),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.clear),
+              onPressed: () {
+                Provider.of<Fridge>(
+                  context,
+                listen: false).clearFridge();
+              },
+            )
+          ],
         ),
         body: Center(
-          child: Fridge(),
+          child: FridgeScreen(),
         ),
       ),
     );
   }
 }
 
-class Fridge extends StatefulWidget {
+class FridgeScreen extends StatefulWidget {
   @override
-  _FridgeState createState() => _FridgeState();
+  _FridgeScreenState createState() => _FridgeScreenState();
 }
 
 final List<FridgeItem> exItems = [
@@ -38,8 +60,7 @@ final List<FridgeItem> exItems = [
   FridgeItem("Spinach", DateTime.now())
 ];
 
-class _FridgeState extends State<Fridge> {
-  final _fridgeItems = exItems;
+class _FridgeScreenState extends State<FridgeScreen> {
   final _biggerFont = TextStyle(fontSize: 18.0);
   final _biggestFont = TextStyle(fontSize: 40.0);
   DateTime selectedDate = DateTime.now();
@@ -48,25 +69,39 @@ class _FridgeState extends State<Fridge> {
   String _selectedTitle;
 
   @override
-  Widget build(BuildContext context) => new Scaffold(
-        body: _buildFridge(),
+  Widget build(BuildContext context) => Consumer<Fridge>(
+    builder: (context, fridge, child) => Scaffold(
+      body: _buildFridge(fridge.items),
+      floatingActionButton: new FloatingActionButton(
+          elevation: 1.0,
+          child: new Icon(Icons.add),
+          onPressed: () {
+            _addItem();
+          }),
+    ),
+  );
+
+
+
+      /*new Scaffold(
+        body: _buildFridge();
         floatingActionButton: new FloatingActionButton(
             elevation: 1.0,
             child: new Icon(Icons.add),
             onPressed: () {
               _addItem();
             }),
-      );
+      );*/
 
-  Widget _buildFridge() {
+  Widget _buildFridge(List<FridgeItem> items) {
     return ListView.builder(
-        itemCount: _fridgeItems.length,
+        itemCount: items.length,
         itemBuilder: (context, i) {
-          _fridgeItems.sort(
+          items.sort(
                   (a,b)  {
                 return a.expiration.compareTo(b.expiration);
               });
-          return _buildFridgeItem(_fridgeItems[i]);
+          return _buildFridgeItem(items[i]);
         });
   }
 
@@ -115,13 +150,10 @@ class _FridgeState extends State<Fridge> {
                   RaisedButton(
                     onPressed: () {
                       if (selectedDate != null && _formKey.currentState.validate()) {
-                        setState(() {
-                          _fridgeItems
-                              .add(FridgeItem(_selectedTitle, selectedDate));
-                          Navigator.of(
+                        Provider.of<Fridge>(context,listen: false).addFood(FridgeItem(_selectedTitle, selectedDate));
+                        Navigator.of(
                             context,
                             rootNavigator: true).pop(context);
-                        });
                       }
                     },
                     child: Text("Add to list"),
@@ -146,9 +178,4 @@ class _FridgeState extends State<Fridge> {
   }
 }
 
-class FridgeItem {
-  String name;
-  DateTime expiration;
 
-  FridgeItem(this.name, this.expiration);
-}
