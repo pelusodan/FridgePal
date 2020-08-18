@@ -10,20 +10,20 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'fridge.dart';
+import 'model/fridge.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => Fridge(),
-      child: MyApp(),
-    )
-  );
+  runApp(ChangeNotifierProvider(
+    create: (context) => Fridge(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // load from sql
+    Provider.of<Fridge>(context, listen: false).updateItems();
     return MaterialApp(
       title: 'FridgePal',
       theme: ThemeData(primaryColor: Colors.amber),
@@ -35,9 +35,7 @@ class MyApp extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.clear),
               onPressed: () {
-                Provider.of<Fridge>(
-                  context,
-                listen: false).clearFridge();
+                Provider.of<Fridge>(context, listen: false).clearFridge();
               },
             )
           ],
@@ -55,11 +53,6 @@ class FridgeScreen extends StatefulWidget {
   _FridgeScreenState createState() => _FridgeScreenState();
 }
 
-final List<FridgeItem> exItems = [
-  FridgeItem("Spaghetti", DateTime.now()),
-  FridgeItem("Spinach", DateTime.now())
-];
-
 class _FridgeScreenState extends State<FridgeScreen> {
   final _biggerFont = TextStyle(fontSize: 18.0);
   final _biggestFont = TextStyle(fontSize: 40.0);
@@ -70,37 +63,24 @@ class _FridgeScreenState extends State<FridgeScreen> {
 
   @override
   Widget build(BuildContext context) => Consumer<Fridge>(
-    builder: (context, fridge, child) => Scaffold(
-      body: _buildFridge(fridge.items),
-      floatingActionButton: new FloatingActionButton(
-          elevation: 1.0,
-          child: new Icon(Icons.add),
-          onPressed: () {
-            _addItem();
-          }),
-    ),
-  );
-
-
-
-      /*new Scaffold(
-        body: _buildFridge();
-        floatingActionButton: new FloatingActionButton(
-            elevation: 1.0,
-            child: new Icon(Icons.add),
-            onPressed: () {
-              _addItem();
-            }),
-      );*/
+        builder: (context, fridge, child) => Scaffold(
+          body: _buildFridge(fridge.items),
+          floatingActionButton: new FloatingActionButton(
+              elevation: 1.0,
+              child: new Icon(Icons.add),
+              onPressed: () {
+                _addItem();
+              }),
+        ),
+      );
 
   Widget _buildFridge(List<FridgeItem> items) {
     return ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, i) {
-          items.sort(
-                  (a,b)  {
-                return a.expiration.compareTo(b.expiration);
-              });
+          items.sort((a, b) {
+            return a.expiration.compareTo(b.expiration);
+          });
           return _buildFridgeItem(items[i]);
         });
   }
@@ -113,8 +93,9 @@ class _FridgeScreenState extends State<FridgeScreen> {
           style: _biggestFont,
         ),
         title: Text(
-            fridgeItem.name,
-        style: _biggerFont,),
+          fridgeItem.name,
+          style: _biggerFont,
+        ),
       ),
     );
   }
@@ -127,37 +108,37 @@ class _FridgeScreenState extends State<FridgeScreen> {
             content: Column(
               children: <Widget>[
                 RaisedButton(
-                    onPressed: () => _selectDate(context),
-                    child: Text("Select date"),
+                  onPressed: () => _selectDate(context),
+                  child: Text("Select date"),
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      TextFormField(
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Needs a name!';
+                          }
+                          _selectedTitle = value;
+                          return null;
+                        },
+                      )
+                    ],
                   ),
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        TextFormField(
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Needs a name!';
-                            }
-                            _selectedTitle = value;
-                            return null;
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-                  RaisedButton(
-                    onPressed: () {
-                      if (selectedDate != null && _formKey.currentState.validate()) {
-                        Provider.of<Fridge>(context,listen: false).addFood(FridgeItem(_selectedTitle, selectedDate));
-                        Navigator.of(
-                            context,
-                            rootNavigator: true).pop(context);
-                      }
-                    },
-                    child: Text("Add to list"),
-                  ),
+                ),
+                RaisedButton(
+                  onPressed: () {
+                    if (selectedDate != null &&
+                        _formKey.currentState.validate()) {
+                      Provider.of<Fridge>(context, listen: false)
+                          .addFood(FridgeItem(_selectedTitle, selectedDate));
+                      Navigator.of(context, rootNavigator: true).pop(context);
+                    }
+                  },
+                  child: Text("Add to list"),
+                ),
               ],
             ),
           );
@@ -177,5 +158,3 @@ class _FridgeScreenState extends State<FridgeScreen> {
     }
   }
 }
-
-
