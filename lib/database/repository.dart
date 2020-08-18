@@ -59,5 +59,10 @@ class Repository {
   }
 
   //TODO: clear all items from fridge
-  //TODO: clear a single item from the fridge
+
+  Future<int> remove(FridgeItem item) async {
+    Database db = await database;
+    int id = await db.rawDelete('DELETE FROM $_tableName WHERE name = ?', [item.name]);
+    return id;
+  }
 }

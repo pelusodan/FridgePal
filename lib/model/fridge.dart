@@ -17,8 +17,9 @@ class Fridge extends ChangeNotifier {
     notifyListeners();
   }
 
-  void dumpFood(FridgeItem item) {
-    _items.remove(item);
+  void dumpFood(FridgeItem item) async {
+    await db.remove(item);
+    _items = await db.getFridgeItems();
     notifyListeners();
   }
 

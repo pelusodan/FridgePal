@@ -55,10 +55,9 @@ class FridgeScreen extends StatefulWidget {
 
 class _FridgeScreenState extends State<FridgeScreen> {
   final _biggerFont = TextStyle(fontSize: 18.0);
-  final _biggestFont = TextStyle(fontSize: 40.0);
+  final _biggestFont = TextStyle(fontSize: 36.0);
   DateTime selectedDate = DateTime.now();
   final _formKey = GlobalKey<FormState>();
-
   String _selectedTitle;
 
   @override
@@ -86,17 +85,27 @@ class _FridgeScreenState extends State<FridgeScreen> {
   }
 
   Widget _buildFridgeItem(FridgeItem fridgeItem) {
-    return Card(
-      child: ListTile(
-        leading: Text(
-          "${fridgeItem.expiration.difference(DateTime.now()).inDays} days",
-          style: _biggestFont,
-        ),
-        title: Text(
-          fridgeItem.name,
-          style: _biggerFont,
+
+    return Dismissible(
+      child: Card(
+        child: ListTile(
+          leading: Text(
+            fridgeItem.name,
+            style: _biggestFont,
+          ),
+          title: Text(
+            "${fridgeItem.expiration.difference(DateTime.now()).inDays} days",
+            style: _biggerFont,
+          ),
         ),
       ),
+      background: Container(
+        color: Colors.red,
+      ),
+      key: UniqueKey(),
+      onDismissed: (direction) {
+        Provider.of<Fridge>(context, listen: false).dumpFood(fridgeItem);
+      },
     );
   }
 
