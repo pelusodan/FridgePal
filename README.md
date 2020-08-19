@@ -1,4 +1,5 @@
 # FridgePal
+![](images/motoHome.png)
 #### What's good eatin?
 
 This is my first Flutter application. I wanted to use it as a small stepping
