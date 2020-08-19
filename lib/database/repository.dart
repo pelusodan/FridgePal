@@ -58,7 +58,11 @@ class Repository {
     return items;
   }
 
-  //TODO: clear all items from fridge
+  Future<int> removeAll() async {
+    Database db = await database;
+    int id = await db.delete(_tableName);
+    return id;
+  }
 
   Future<int> remove(FridgeItem item) async {
     Database db = await database;

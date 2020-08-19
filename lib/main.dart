@@ -28,25 +28,61 @@ class MyApp extends StatelessWidget {
       title: 'FridgePal',
       theme: ThemeData(primaryColor: Colors.amber),
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("What's in the Fridge?"),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.clear),
-              onPressed: () {
-                Provider.of<Fridge>(context, listen: false).clearFridge();
-              },
-            )
-          ],
-        ),
-        body: Center(
-          child: FridgeScreen(),
-        ),
-      ),
+      home: Main()
     );
   }
 }
+
+class Main extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("What's in the Fridge?"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.clear),
+            onPressed: () {
+              return _showConfirmationDialog(context);
+            },
+          )
+        ],
+      ),
+      body: Center(
+        child: FridgeScreen(),
+      ),
+    );
+  }
+
+  Future<void> _showConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Delete all items from fridge?"),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('This permanently removes all entries from database'),
+                  Text('It cannot be undone'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Delete"),
+                onPressed: () {
+                  Provider.of<Fridge>(context, listen: false).clearFridge();
+                  Navigator.of(context, rootNavigator: true).pop(context);
+                },
+              )
+            ],
+          );
+        });
+  }
+}
+
 
 class FridgeScreen extends StatefulWidget {
   @override
@@ -85,7 +121,6 @@ class _FridgeScreenState extends State<FridgeScreen> {
   }
 
   Widget _buildFridgeItem(FridgeItem fridgeItem) {
-
     return Dismissible(
       child: Card(
         child: ListTile(
