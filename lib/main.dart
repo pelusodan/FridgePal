@@ -25,11 +25,10 @@ class MyApp extends StatelessWidget {
     // load from sql
     Provider.of<Fridge>(context, listen: false).updateItems();
     return MaterialApp(
-      title: 'FridgePal',
-      theme: ThemeData(primaryColor: Colors.amber),
-      debugShowCheckedModeBanner: false,
-      home: Main()
-    );
+        title: 'FridgePal',
+        theme: ThemeData(primaryColor: Colors.amber),
+        debugShowCheckedModeBanner: false,
+        home: Main());
   }
 }
 
@@ -82,7 +81,6 @@ class Main extends StatelessWidget {
         });
   }
 }
-
 
 class FridgeScreen extends StatefulWidget {
   @override
@@ -176,8 +174,12 @@ class _FridgeScreenState extends State<FridgeScreen> {
                   onPressed: () {
                     if (selectedDate != null &&
                         _formKey.currentState.validate()) {
-                      Provider.of<Fridge>(context, listen: false)
-                          .addFood(FridgeItem(_selectedTitle, selectedDate));
+                      Provider.of<Fridge>(context, listen: false).addFood(
+                          FridgeItem(
+                              (_selectedTitle + selectedDate.toIso8601String())
+                                  .hashCode,
+                              _selectedTitle,
+                              selectedDate));
                       Navigator.of(context, rootNavigator: true).pop(context);
                     }
                   },

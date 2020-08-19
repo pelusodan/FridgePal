@@ -35,18 +35,21 @@ class Fridge extends ChangeNotifier {
 }
 
 class FridgeItem {
+  int id;
   String name;
   DateTime expiration;
 
-  FridgeItem(this.name, this.expiration);
+  FridgeItem(this.id,this.name, this.expiration);
 
   FridgeItem.fromMap(Map<String, dynamic> map) {
+    id = map["id"];
     name = map["name"];
     expiration = DateTime.parse(map["expiration"]);
   }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
+      "id": id,
       "name": name,
       "expiration": expiration.toIso8601String()
     };

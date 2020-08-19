@@ -8,7 +8,7 @@ import 'package:sqflite/sqflite.dart';
 class Repository {
   static final _tableName = "fridge_items";
   static final _databaseName = "FridgeDatabase.db";
-  static final _databaseVersion = 1;
+  static final _databaseVersion = 2;
 
   // singleton pattern
   Repository._internal();
@@ -23,8 +23,6 @@ class Repository {
     return _database;
   }
 
-  Future updateFridgeItem(FridgeItem item) async {}
-
   _initDatabase() async {
     Directory docs = await getApplicationDocumentsDirectory();
     String path = join(docs.path, _databaseName);
@@ -35,7 +33,8 @@ class Repository {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $_tableName (
-        "name" TEXT PRIMARY KEY,
+      "id" INTEGER PRIMARY KEY, 
+        "name" TEXT NOT NULL,
         "expiration" TEXT NOT NULL
       )
       ''');
@@ -66,7 +65,7 @@ class Repository {
 
   Future<int> remove(FridgeItem item) async {
     Database db = await database;
-    int id = await db.rawDelete('DELETE FROM $_tableName WHERE name = ?', [item.name]);
+    int id = await db.rawDelete('DELETE FROM $_tableName WHERE id = ?', [item.id]);
     return id;
   }
 }
